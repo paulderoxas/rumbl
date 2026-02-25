@@ -29,4 +29,13 @@ defmodule RumblWeb.SessionController do
     |> put_flash(:info, "You have been logged out")
     |> redirect(to: ~p"/")
   end
+
+  def create_from_live(conn, %{"user_id" => user_id}) do
+    user = Rumbl.Accounts.get_user!(user_id)
+
+    conn
+    |> RumblWeb.Auth.login(user)
+    |> put_flash(:info, "Welcome back, #{user.name}!")
+    |> redirect(to: ~p"/")
+  end
 end

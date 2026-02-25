@@ -2,36 +2,44 @@ defmodule RumblWeb.Router do
   use RumblWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_live_flash
-    plug :put_root_layout, html: {RumblWeb.Layouts, :root}
-    plug :protect_from_forgery
-    plug :put_secure_browser_headers
-    plug RumblWeb.Auth
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, html: {RumblWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(RumblWeb.Auth)
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/", RumblWeb do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    get "/", PageController, :home
+    get("/", PageController, :home)
 
-    # User routes
-    resources "/users", UserController, only: [:index, :show, :new, :create]
+    # use LiveView for the login form
+    get("/sessions/callback", SessionController, :create_from_live)
+    live("/sessions/new", SessionLive.New)
 
-    # Session routes
-    resources "/sessions", SessionController, only: [:new, :create]
-    delete "/sessions", SessionController, :delete
+    # Users
+    live("/users", UserLive.Index)
+    live("/users/new", UserLive.New)
+    live("/users/:id", UserLive.Show)
 
-    # Video routes
-    resources "/videos", VideoController
+    # Videos (all protected by auth check inside each LiveView's mount)
+    live("/videos", VideoLive.Index)
+    live("/videos/new", VideoLive.New)
+    live("/videos/:id", VideoLive.Show)
+    live("/videos/:id/edit", VideoLive.Edit)
 
-    # Watch video (public)
-    get "/watch/:id", VideoController, :watch
+    # Watch (public — auth check is optional inside mount)
+    live("/watch/:id", VideoLive.Watch)
+
+    # Keep the logout as a controller since it needs to drop the session
+    delete("/sessions", SessionController, :delete)
   end
 
   # Other scopes may use custom stacks.
@@ -49,10 +57,10 @@ defmodule RumblWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through(:browser)
 
-      live_dashboard "/dashboard", metrics: RumblWeb.Telemetry
-      forward "/mailbox", Plug.Swoosh.MailboxPreview
+      live_dashboard("/dashboard", metrics: RumblWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
     end
   end
 end

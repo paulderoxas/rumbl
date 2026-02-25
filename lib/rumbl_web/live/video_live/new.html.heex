@@ -3,7 +3,7 @@
   <:subtitle>Share a YouTube video with the community</:subtitle>
 </.header>
 
-<.simple_form :let={f} for={@changeset} action={~p"/videos"}>
+<.simple_form :let={f} for={@changeset} phx-submit="save" phx-change="validate">
   <.error :if={@changeset.action}>
     Oops, something went wrong! Please check the errors below.
   </.error>

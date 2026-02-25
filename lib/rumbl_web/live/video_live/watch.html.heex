@@ -11,7 +11,13 @@
 
   <div class="mt-6">
     <%# Video Player %>
-    <div id="video-container" data-id={@video.id} data-player-id="video-player" class="aspect-video bg-black rounded-lg overflow-hidden">
+    <div
+      id="video-container"
+      data-id={@video.id}
+      data-player-id="video-player"
+      data-user-token={@user_token}
+      class="aspect-video bg-black rounded-lg overflow-hidden"
+    >
       <%= if youtube_id(@video) do %>
         <iframe
           id="video-player"
@@ -93,9 +99,3 @@
     <.back navigate={~p"/videos"}>Back to videos</.back>
   </div>
 </div>
-
-<%# User token for WebSocket authentication %>
-<script>
-  window.userToken = "<%= @user_token %>";
-  window.videoId = <%= @video.id %>;
-</script>

@@ -3,7 +3,7 @@
   <:subtitle>Welcome back to Rumbl!</:subtitle>
 </.header>
 
-<.simple_form :let={f} for={%{}} as={:session} action={~p"/sessions"}>
+<.simple_form :let={f} for={%{}} as={:session} phx-submit="save">
   <.input field={f[:username]} type="text" label="Username" required />
   <.input field={f[:password]} type="password" label="Password" required />
 
