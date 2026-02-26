@@ -13,9 +13,10 @@
     <%# Video Player %>
     <div
       id="video-container"
-      data-id={@video.id}
+      data-id={@video.slug}
       data-player-id="video-player"
       data-user-token={@user_token}
+      phx-hook="VideoPlayer"
       class="aspect-video bg-black rounded-lg overflow-hidden"
     >
       <%= if youtube_id(@video) do %>

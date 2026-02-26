@@ -18,6 +18,7 @@ defmodule RumblWeb.VideoLive.Index do
   end
 
   # Triggered by phx-click="delete" phx-value-id={video.id} in index.html.heex
+  @spec handle_event(<<_::48>>, map(), Phoenix.LiveView.Socket.t()) :: {:noreply, any()}
   def handle_event("delete", %{"id" => id}, socket) do
     video = Multimedia.get_user_video!(socket.assigns.current_user, id)
     {:ok, _} = Multimedia.delete_video(video)
