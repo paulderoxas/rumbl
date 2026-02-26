@@ -1,0 +1,74 @@
+<header class="navbar px-4 sm:px-6 lg:px-8 border-b border-base-300">
+  <div class="flex-1">
+    <a href="/" class="flex w-fit items-center gap-2 hover:opacity-80 transition-opacity">
+      <span class="text-xl font-bold text-brand">Rumbl</span>
+    </a>
+  </div>
+  <div class="flex-none">
+    <ul class="flex items-center gap-2 px-1">
+      <%= if @current_user do %>
+        <li>
+          <a href="/videos" class="btn btn-ghost btn-sm">My Videos</a>
+        </li>
+        <li class="relative" id="profile-menu-container">
+          <button
+            id="profile-menu-btn"
+            onclick="document.getElementById('profile-dropdown').classList.toggle('hidden')"
+            class="btn btn-ghost btn-sm btn-circle"
+            aria-label="Profile menu"
+          >
+            <div class="size-8 rounded-full bg-brand text-white flex items-center justify-center font-semibold text-sm select-none">
+              <%= @current_user.name |> String.first() |> String.upcase() %>
+            </div>
+          </button>
+          <div
+            id="profile-dropdown"
+            class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-base-100 border border-base-300 z-50 p-2"
+          >
+            <div class="px-3 py-2 border-b border-base-300 mb-1">
+              <p class="text-sm font-semibold text-base-content"><%= @current_user.name %></p>
+              <p class="text-xs text-base-content/60"><%= @current_user.username %></p>
+            </div>
+            <div class="px-3 py-2 border-b border-base-300 mb-1">
+              <p class="text-xs font-medium text-base-content/50 uppercase tracking-wide mb-2">Theme</p>
+              <.theme_toggle />
+            </div>
+            <.link
+              href="/sessions"
+              method="delete"
+              class="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg hover:bg-base-200 text-error transition-colors"
+            >
+              <.icon name="hero-arrow-right-on-rectangle" class="size-4" />
+              Log out
+            </.link>
+          </div>
+        </li>
+      <% else %>
+        <li>
+          <a href="/sessions/new" class="btn btn-ghost btn-sm">Log in</a>
+        </li>
+        <li>
+          <a href="/users/new" class="btn btn-primary btn-sm">Register</a>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</header>
+
+<main class="px-4 py-10 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-4xl space-y-4">
+    {@inner_content}
+  </div>
+</main>
+
+<.flash_group flash={@flash} />
+
+<script>
+  document.addEventListener('click', function(e) {
+    const container = document.getElementById('profile-menu-container');
+    const dropdown = document.getElementById('profile-dropdown');
+    if (container && dropdown && !container.contains(e.target)) {
+      dropdown.classList.add('hidden');
+    }
+  });
+</script>

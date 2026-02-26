@@ -151,6 +151,8 @@ defmodule Rumbl.Multimedia do
   @doc """
   Deletes an annotation.
   """
+  def get_annotation!(id), do: Repo.get!(Annotation, id)
+
   def delete_annotation(%Annotation{} = annotation) do
     Repo.delete(annotation)
   end

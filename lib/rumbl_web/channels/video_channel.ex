@@ -22,11 +22,26 @@ defmodule RumblWeb.VideoChannel do
     case Multimedia.annotate_video(user, socket.assigns.video_id, params) do
       {:ok, annotation} ->
         annotation = Rumbl.Repo.preload(annotation, :user)
-        broadcast!(socket, "new_annotation", annotation_json(annotation))
-        {:reply, :ok, socket}
+        broadcast_from!(socket, "new_annotation", annotation_json(annotation))
+        {:reply, {:ok, annotation_json(annotation)}, socket}
 
       {:error, changeset} ->
         {:reply, {:error, %{errors: format_errors(changeset)}}, socket}
+    end
+  end
+
+  # ↓↓↓ THIS BLOCK MUST EXIST ↓↓↓
+  @impl true
+  def handle_in("delete_annotation", %{"id" => id}, socket) do
+    user = Accounts.get_user!(socket.assigns.user_id)
+    annotation = Multimedia.get_annotation!(id)
+
+    if annotation.user_id == user.id do
+      {:ok, _} = Multimedia.delete_annotation(annotation)
+      broadcast!(socket, "annotation_deleted", %{id: id})
+      {:reply, :ok, socket}
+    else
+      {:reply, {:error, %{reason: "unauthorized"}}, socket}
     end
   end
 
