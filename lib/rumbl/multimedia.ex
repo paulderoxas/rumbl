@@ -34,13 +34,6 @@ defmodule Rumbl.Multimedia do
   @doc """
   Gets a single video by slug.
   """
-  def get_video(slug) when is_binary(slug) do
-    Video
-    |> where([v], v.slug == ^slug)
-    |> preload([:user, :category])
-    |> Repo.one()
-  end
-
   def get_video!(slug) when is_binary(slug) do
     Video
     |> Repo.get_by!(slug: slug)
