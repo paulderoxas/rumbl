@@ -20,7 +20,7 @@
       </.header>
 
       <.simple_form :let={f} for={@changeset} phx-submit="save" phx-change="validate">
-        <.error :if={@changeset.action}>
+        <.error :if={@changeset.action in [:insert, :update]}>
           Oops, something went wrong! Please check the errors below.
         </.error>
 

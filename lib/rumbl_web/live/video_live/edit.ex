@@ -48,7 +48,7 @@ defmodule RumblWeb.VideoLive.Edit do
         {:noreply,
          socket
          |> put_flash(:info, "Video updated successfully.")
-         |> push_navigate(to: ~p"/videos/#{video.id}")}
+         |> push_navigate(to: ~p"/videos/#{video.slug}")}
 
       {:error, changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

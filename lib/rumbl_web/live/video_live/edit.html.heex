@@ -19,8 +19,8 @@
         <:subtitle><%= @video.title %></:subtitle>
       </.header>
 
-      <.simple_form :let={f} for={@changeset} phx-submit="save" phx-change="validate">
-        <.error :if={@changeset.action}>
+      <.simple_form :let={f} for={@changeset} phx-submit="save" phx-change="validate" class="mt-6">
+        <.error :if={@changeset.action in [:insert, :update]}>
           Oops, something went wrong! Please check the errors below.
         </.error>
 
@@ -38,7 +38,7 @@
         <.back navigate={~p"/videos"}>Back to video</.back>
         <.button
           phx-click="delete"
-          phx-value-id={@video.id}
+          phx-value-id={@video.slug}
           data-confirm="Are you sure you want to delete this video?"
           class="bg-slate-800 hover:bg-red-700 text-red-500 hover:text-white px-4 py-2 rounded-lg transition-colors duration-200"
         >

@@ -42,7 +42,7 @@ defmodule RumblWeb.VideoLive.New do
         {:noreply,
          socket
          |> put_flash(:info, "Video created successfully.")
-         |> push_navigate(to: ~p"/videos/#{video.id}")}
+         |> push_navigate(to: ~p"/videos/#{video.slug}")}
 
       {:error, changeset} ->
         {:noreply, assign(socket, changeset: changeset)}

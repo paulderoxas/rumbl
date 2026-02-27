@@ -8,10 +8,17 @@ defmodule RumblWeb.VideoLive.Show do
     {:ok, assign(socket, current_user: current_user)}
   end
 
-  # Loads the video by :id from the URL (/videos/:id)
   def handle_params(%{"id" => id}, _uri, socket) do
-    video = Multimedia.get_video!(id)
-    {:noreply, assign(socket, video: video)}
+    case Multimedia.get_video(id) do
+      nil ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Video not found.")
+         |> push_navigate(to: ~p"/videos")}
+
+      video ->
+        {:noreply, assign(socket, video: video)}
+    end
   end
 
   defp get_user_from_session(session) do

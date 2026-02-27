@@ -25,8 +25,6 @@ defmodule Rumbl.Multimedia.Video do
     |> cast(attrs, [:title, :url, :description, :category_id])
     |> validate_required([:title, :url])
     |> validate_url(:url)
-    |> assoc_constraint(:user)
-    |> assoc_constraint(:category)
     |> slugify_title()
     |> unique_constraint(:slug)
   end
@@ -36,6 +34,7 @@ defmodule Rumbl.Multimedia.Video do
       case URI.parse(url) do
         %URI{scheme: scheme, host: host} when scheme in ["http", "https"] and not is_nil(host) ->
           []
+
         _ ->
           [{field, "must be a valid URL"}]
       end
