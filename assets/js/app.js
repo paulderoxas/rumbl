@@ -120,26 +120,26 @@ const Video = {
     const isOwner = currentUserId && annotation.user.id === currentUserId;
 
     const div = document.createElement("div");
-    div.className = "annotation p-3 bg-gray-50 rounded-lg";
+    div.className = "annotation p-4 bg-white/[0.03] border border-white/[0.1] backdrop-blur-md rounded-lg";
     div.dataset.id = annotation.id;
     div.dataset.at = annotation.at;
     div.innerHTML = `
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono text-brand bg-brand/10 px-2 py-1 rounded">
+          <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded">
             ${this.formatTime(annotation.at)}
           </span>
-          <span class="font-semibold text-gray-800">${annotation.user.username}</span>
+          <span class="font-semibold text-slate-50">${annotation.user.username}</span>
         </div>
         ${isOwner ? `
-          <button class="delete-annotation text-gray-400 hover:text-red-500 transition-colors" data-id="${annotation.id}" title="Delete annotation">
+          <button class="delete-annotation text-slate-400 hover:text-red-500 transition-colors" data-id="${annotation.id}" title="Delete annotation">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
             </svg>
           </button>
         ` : ""}
       </div>
-      <p class="mt-1 text-gray-600">${annotation.body}</p>
+      <p class="mt-2 text-slate-300">${annotation.body}</p>
     `;
 
     if (isOwner) {

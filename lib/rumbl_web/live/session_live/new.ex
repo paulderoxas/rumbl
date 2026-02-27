@@ -3,8 +3,9 @@ defmodule RumblWeb.SessionLive.New do
 
   alias Rumbl.Accounts
 
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(_params, session, socket) do
+    current_user = get_user_from_session(session)
+    {:ok, assign(socket, current_user: current_user)}
   end
 
   def handle_event(
@@ -18,6 +19,12 @@ defmodule RumblWeb.SessionLive.New do
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Invalid username or password")}
+    end
+  end
+
+  defp get_user_from_session(session) do
+    with user_id when not is_nil(user_id) <- Map.get(session, "user_id") do
+      Rumbl.Accounts.get_user(user_id)
     end
   end
 end

@@ -1,25 +1,47 @@
-<.header>
-  Create Account
-  <:subtitle>Join Rumbl and start sharing videos!</:subtitle>
-</.header>
+<div class="overflow-x-hidden min-h-screen text-slate-50">
+  <div class="fixed inset-0 bg-slate-950 -z-10"></div>
+  <div class="fixed inset-0 overflow-hidden pointer-events-none" style="z-index:0">
+    <div class="orb orb-1 absolute w-[600px] h-[600px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-indigo-500 to-violet-500 -top-52 -left-52"></div>
+    <div class="orb orb-2 absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-pink-500 to-indigo-500 -bottom-40 -right-40"></div>
+    <div class="orb orb-3 absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-violet-500 to-pink-500 top-1/2 left-1/2"></div>
+  </div>
 
-<.simple_form :let={f} for={@changeset} phx-submit="save" phx-change="validate">
-  <.error :if={@changeset.action}>
-    Oops, something went wrong! Please check the errors below.
-  </.error>
+  <%# Noise texture %>
+  <svg class="fixed inset-0 w-full h-full opacity-[0.03] pointer-events-none" style="z-index:0" xmlns='http://www.w3.org/2000/svg'>
+    <filter id='noise'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/></filter>
+    <rect width='100%' height='100%' filter='url(#noise)'/>
+  </svg>
 
-  <.input field={f[:name]} type="text" label="Name" required />
-  <.input field={f[:username]} type="text" label="Username" required />
-  <.input field={f[:password]} type="password" label="Password" required />
+  <div class="relative flex items-center justify-center min-h-screen px-4" style="z-index:1">
+    <div class="w-full max-w-md">
+      <%# Frosted glass container %>
+      <div class="rounded-3xl p-8 bg-white/[0.05] border border-white/[0.1] backdrop-blur-md">
+        <.header>
+          Create Account
+          <:subtitle>Join Rumbl and start sharing videos!</:subtitle>
+        </.header>
 
-  <:actions>
-    <.button>Create Account</.button>
-  </:actions>
-</.simple_form>
+        <.simple_form :let={f} for={@changeset} phx-submit="save" phx-change="validate">
+          <.error :if={@changeset.action}>
+            Oops, something went wrong! Please check the errors below.
+          </.error>
 
-<p class="mt-4 text-sm text-gray-600">
-  Already have an account?
-  <.link navigate={~p"/sessions/new"} class="font-semibold text-brand hover:underline">
-    Log in
-  </.link>
-</p>
+          <.input field={f[:name]} type="text" label="Name" required />
+          <.input field={f[:username]} type="text" label="Username" required />
+          <.input field={f[:password]} type="password" label="Password" required />
+
+          <:actions>
+            <.button>Create Account</.button>
+          </:actions>
+        </.simple_form>
+
+        <p class="mt-4 text-sm text-slate-300">
+          Already have an account?
+          <.link navigate={~p"/sessions/new"} class="font-semibold text-indigo-400 hover:text-indigo-300">
+            Log in
+          </.link>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

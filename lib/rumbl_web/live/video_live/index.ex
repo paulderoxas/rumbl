@@ -2,6 +2,7 @@ defmodule RumblWeb.VideoLive.Index do
   use RumblWeb, :live_view
 
   alias Rumbl.Multimedia
+  alias Rumbl.Multimedia.Video
 
   def mount(_params, session, socket) do
     current_user = get_user_from_session(session)
@@ -39,4 +40,6 @@ defmodule RumblWeb.VideoLive.Index do
       Rumbl.Accounts.get_user(user_id)
     end
   end
+
+  def youtube_id(video), do: Video.youtube_id(video)
 end

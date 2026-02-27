@@ -1,4 +1,4 @@
-<header class="navbar px-4 sm:px-6 lg:px-8 border-b border-base-300">
+<header class="navbar px-4 sm:px-6 lg:px-8 border-b border-white/5 sticky top-0 z-50 bg-slate-950/70 backdrop-blur-md">
   <div class="flex-1">
     <a href="/" class="flex w-fit items-center gap-2 hover:opacity-80 transition-opacity">
       <span class="text-xl font-bold text-brand">Rumbl</span>
@@ -23,15 +23,11 @@
           </button>
           <div
             id="profile-dropdown"
-            class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-base-100 border border-base-300 z-50 p-2"
+            class="hidden absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-slate-950/70 backdrop-blur-md border border-base-300 z-50 p-2"
           >
             <div class="px-3 py-2 border-b border-base-300 mb-1">
               <p class="text-sm font-semibold text-base-content"><%= @current_user.name %></p>
               <p class="text-xs text-base-content/60"><%= @current_user.username %></p>
-            </div>
-            <div class="px-3 py-2 border-b border-base-300 mb-1">
-              <p class="text-xs font-medium text-base-content/50 uppercase tracking-wide mb-2">Theme</p>
-              <.theme_toggle />
             </div>
             <.link
               href="/sessions"
@@ -55,10 +51,8 @@
   </div>
 </header>
 
-<main class="px-4 py-10 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-4xl space-y-4">
-    {@inner_content}
-  </div>
+<main class="px-2 py-5 sm:px-3 lg:px-4">
+  {@inner_content}
 </main>
 
 <.flash_group flash={@flash} />

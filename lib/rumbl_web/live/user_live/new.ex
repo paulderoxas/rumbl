@@ -4,9 +4,10 @@ defmodule RumblWeb.UserLive.New do
   alias Rumbl.Accounts
   alias Rumbl.Accounts.User
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
+    current_user = get_user_from_session(session)
     changeset = Accounts.change_registration(%User{})
-    {:ok, assign(socket, changeset: changeset)}
+    {:ok, assign(socket, changeset: changeset, current_user: current_user)}
   end
 
   # Live validation — fires on every keystroke (phx-change="validate")
@@ -31,6 +32,12 @@ defmodule RumblWeb.UserLive.New do
       {:error, changeset} ->
         # Put the failed changeset back so the form shows errors
         {:noreply, assign(socket, changeset: changeset)}
+    end
+  end
+
+  defp get_user_from_session(session) do
+    with user_id when not is_nil(user_id) <- Map.get(session, "user_id") do
+      Rumbl.Accounts.get_user(user_id)
     end
   end
 end
