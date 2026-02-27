@@ -35,6 +35,7 @@ defmodule RumblWeb.Router do
     live("/videos/new", VideoLive.New)
     live("/videos/:id/edit", VideoLive.Edit)
     live("/videos/:id", VideoLive.Show)
+    live("/rooms/:code", RoomLive)
 
     # Watch
     live("/watch/:id", VideoLive.Watch)

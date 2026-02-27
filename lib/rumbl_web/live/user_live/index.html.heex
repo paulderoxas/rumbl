@@ -1,15 +1,23 @@
 <div class="overflow-x-hidden min-h-screen text-slate-50">
   <div class="fixed inset-0 bg-slate-950 -z-10"></div>
   <div class="fixed inset-0 overflow-hidden pointer-events-none" style="z-index:0">
-    <div class="orb orb-1 absolute w-[600px] h-[600px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-indigo-500 to-violet-500 -top-52 -left-52"></div>
-    <div class="orb orb-2 absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-pink-500 to-indigo-500 -bottom-40 -right-40"></div>
-    <div class="orb orb-3 absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-violet-500 to-pink-500 top-1/2 left-1/2"></div>
+    <div class="orb orb-1 absolute w-[600px] h-[600px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-indigo-500 to-violet-500 -top-52 -left-52">
+    </div>
+    <div class="orb orb-2 absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-pink-500 to-indigo-500 -bottom-40 -right-40">
+    </div>
+    <div class="orb orb-3 absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-violet-500 to-pink-500 top-1/2 left-1/2">
+    </div>
   </div>
 
-  <%# Noise texture %>
-  <svg class="fixed inset-0 w-full h-full opacity-[0.03] pointer-events-none" style="z-index:0" xmlns='http://www.w3.org/2000/svg'>
-    <filter id='noise'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/></filter>
-    <rect width='100%' height='100%' filter='url(#noise)'/>
+  <svg
+    class="fixed inset-0 w-full h-full opacity-[0.03] pointer-events-none"
+    style="z-index:0"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noise)" />
   </svg>
 
   <div class="relative px-4 py-8 sm:px-6 lg:px-8" style="z-index:1">
@@ -17,8 +25,8 @@
       <.header>All Users</.header>
 
       <.table id="users" rows={@users}>
-        <:col :let={user} label="Name"><%= user.name %></:col>
-        <:col :let={user} label="Username">@<%= user.username %></:col>
+        <:col :let={user} label="Name">{user.name}</:col>
+        <:col :let={user} label="Username">@{user.username}</:col>
         <:action :let={user}>
           <.link navigate={~p"/users/#{user}"}>View</.link>
         </:action>

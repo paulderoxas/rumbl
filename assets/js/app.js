@@ -172,6 +172,17 @@ const Hooks = {
         Video.init(videoSocket, this.el);
       }
     }
+  },
+
+  RoomVideoPlayer: {
+    mounted() {
+      const userToken = this.el.dataset.userToken;
+      if (userToken) {
+        const roomSocket = new Socket("/socket", { params: { token: userToken } });
+        roomSocket.connect();
+        Room.init(roomSocket, this.el);
+      }
+    }
   }
 }
 
@@ -210,3 +221,134 @@ if (process.env.NODE_ENV === "development") {
     window.liveReloader = reloader
   })
 }
+
+// ============================================================
+// Room: synchronized watch party
+// ============================================================
+const Room = {
+  player: null,
+  channel: null,
+  isHost: false,
+
+  init(socket, el) {
+    const roomCode = el.dataset.roomCode;
+    const isHost = el.dataset.isHost === "true";
+    this.isHost = isHost;
+
+    this.channel = socket.channel(`room:${roomCode}`, {});
+
+    // Playback sync from host
+    this.channel.on("playback", ({ action, time }) => {
+      if (!this.player) return;
+      this.player.seekTo(time, true);
+      if (action === "play") this.player.playVideo();
+      if (action === "pause") this.player.pauseVideo();
+    });
+
+    // Another guest joined — host sends current state
+    this.channel.on("sync_requested", () => {
+      if (!this.isHost || !this.player) return;
+      const time = this.player.getCurrentTime();
+      const paused = this.player.getPlayerState() !== YT.PlayerState.PLAYING;
+      this.channel.push("sync_response", { time, paused });
+    });
+
+    // Chat message received
+    this.channel.on("chat_message", (msg) => {
+      this.appendChatMessage(msg.user.username, msg.body);
+    });
+
+    // Room closed by host
+    this.channel.on("room_closed", () => {
+      document.getElementById("room-closed-overlay")?.classList.remove("hidden");
+    });
+
+    this.channel.join()
+      .receive("ok", () => {
+        console.log("Joined room:", roomCode);
+        // If guest, request sync
+        if (!isHost) {
+          this.channel.push("request_sync", {});
+        }
+      })
+      .receive("error", (e) => console.error("Room join failed", e));
+
+    // Init YouTube player
+    const iframeId = "room-player";
+    onYTReady(() => {
+      this.player = new YT.Player(iframeId, {
+        events: {
+          onReady: () => console.log("Room YT player ready"),
+          onStateChange: (e) => {
+            // Host broadcasts state changes
+            if (!isHost) return;
+            const time = this.player.getCurrentTime();
+            if (e.data === YT.PlayerState.PLAYING) {
+              this.channel.push("playback", { action: "play", time });
+            } else if (e.data === YT.PlayerState.PAUSED) {
+              this.channel.push("playback", { action: "pause", time });
+            }
+          }
+        }
+      });
+    });
+
+    // Host manual controls
+    document.getElementById("btn-play")?.addEventListener("click", () => {
+      const time = this.player?.getCurrentTime() || 0;
+      this.player?.playVideo();
+      this.channel.push("playback", { action: "play", time });
+    });
+
+    document.getElementById("btn-pause")?.addEventListener("click", () => {
+      const time = this.player?.getCurrentTime() || 0;
+      this.player?.pauseVideo();
+      this.channel.push("playback", { action: "pause", time });
+    });
+
+    document.getElementById("btn-seek")?.addEventListener("click", () => {
+      const secs = parseFloat(document.getElementById("seek-input")?.value || 0);
+      this.player?.seekTo(secs, true);
+      this.channel.push("playback", { action: "play", time: secs });
+    });
+
+    // End room button
+    document.getElementById("close-room-btn")?.addEventListener("click", () => {
+      if (confirm("End the room for everyone?")) {
+        this.channel.push("close_room", {});
+        window.location.href = "/videos";
+      }
+    });
+
+    // Chat
+    const chatInput = document.getElementById("chat-input");
+    const chatSend = document.getElementById("chat-send");
+
+    const sendChat = () => {
+      const body = chatInput?.value?.trim();
+      if (body) {
+        this.channel.push("chat_message", { body });
+        chatInput.value = "";
+      }
+    };
+
+    chatSend?.addEventListener("click", sendChat);
+    chatInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendChat();
+    });
+  },
+
+  appendChatMessage(username, body) {
+    const container = document.getElementById("chat-messages");
+    document.getElementById("chat-empty")?.remove();
+
+    const div = document.createElement("div");
+    div.className = "flex flex-col gap-0.5";
+    div.innerHTML = `
+      <span class="text-xs font-semibold text-indigo-400">${username}</span>
+      <p class="text-sm text-white/80 leading-relaxed break-words">${body}</p>
+    `;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+};

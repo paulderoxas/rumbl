@@ -1,0 +1,251 @@
+<div class="overflow-x-hidden min-h-screen text-slate-50">
+  <div class="fixed inset-0 bg-slate-950 -z-10"></div>
+  <div class="fixed inset-0 overflow-hidden pointer-events-none" style="z-index:0">
+    <div class="orb orb-1 absolute w-[600px] h-[600px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-indigo-500 to-violet-500 -top-52 -left-52">
+    </div>
+    <div class="orb orb-2 absolute w-[500px] h-[500px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-pink-500 to-indigo-500 -bottom-40 -right-40">
+    </div>
+    <div class="orb orb-3 absolute w-[400px] h-[400px] rounded-full blur-[80px] opacity-40 bg-gradient-to-br from-violet-500 to-pink-500 top-1/2 left-1/2">
+    </div>
+  </div>
+
+  <svg
+    class="fixed inset-0 w-full h-full opacity-[0.03] pointer-events-none"
+    style="z-index:0"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noise)" />
+  </svg>
+
+  <div class="relative px-4 py-8 sm:px-6 lg:px-8" style="z-index:1">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-6">
+        <.link
+          navigate={~p"/videos"}
+          class="text-indigo-400 hover:text-indigo-300 text-sm font-medium"
+        >
+          ← Back to Videos
+        </.link>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        <div class="lg:col-span-3">
+          <div class="rounded-3xl p-8 bg-white/[0.05] border border-white/[0.1] backdrop-blur-md space-y-6 h-fit">
+            <div>
+              <h1 class="text-3xl font-bold text-slate-50">{@room.video.title}</h1>
+              <p class="mt-2 text-slate-400">
+                Hosted by <span class="text-slate-50 font-medium">{@room.host.username}</span>
+              </p>
+              <p class="mt-2 text-xs font-mono text-indigo-400 bg-indigo-500/10 inline-block px-3 py-1 rounded">
+                Room Code: {@room.code}
+              </p>
+            </div>
+
+            <div
+              id="room-video-container"
+              data-room-code={@room.code}
+              data-is-host={@is_host}
+              data-user-token={@user_token}
+              phx-hook="RoomVideoPlayer"
+              class="aspect-video bg-black rounded-lg overflow-hidden"
+            >
+              <iframe
+                id="room-player"
+                width="100%"
+                height="100%"
+                src={"https://www.youtube.com/embed/#{extract_youtube_id(@room.video.url)}?enablejsapi=1"}
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              >
+              </iframe>
+            </div>
+
+            <%= if @room.video.description do %>
+              <div class="pt-4 border-t border-white/[0.1]">
+                <h3 class="font-semibold text-slate-50">Description</h3>
+                <p class="mt-2 text-slate-300 leading-relaxed">{@room.video.description}</p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="lg:col-span-1 space-y-6 flex flex-col">
+          <div class="rounded-3xl p-6 bg-white/[0.05] border border-white/[0.1] backdrop-blur-md h-fit">
+            <h3 class="text-lg font-semibold text-slate-50 mb-4">Watching Together</h3>
+
+            <div class="mb-6 pb-6 border-b border-white/[0.1]">
+              <p class="text-xs font-semibold text-slate-400 mb-3">Host</p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-sm font-bold text-white">
+                  {String.first(@room.host.username |> String.upcase())}
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-slate-50">{@room.host.username}</p>
+                  <p class="text-xs text-slate-400">Host</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-xs font-semibold text-slate-400 mb-3">You</p>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-pink-500 flex items-center justify-center text-sm font-bold text-white">
+                  {String.first(@current_user.username |> String.upcase())}
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-slate-50">{@current_user.username}</p>
+                  <p class="text-xs text-slate-400">Viewer</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-white/[0.1]">
+              <button
+                phx-click="leave_room"
+                class={[
+                  "w-full px-4 py-2 rounded-lg transition-colors font-medium text-sm",
+                  if(@is_host,
+                    do: "bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400",
+                    else:
+                      "bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1] text-slate-50"
+                  )
+                ]}
+              >
+                {if @is_host, do: "End Room", else: "Leave Room"}
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="rounded-3xl p-6 bg-white/[0.05] border border-white/[0.1] backdrop-blur-md flex flex-col h-fit"
+            style="max-height: calc(100vh - 24rem)"
+          >
+            <h3 class="text-lg font-semibold text-slate-50 flex-shrink-0 mb-4">Comments</h3>
+
+            <div class="mt-4 flex-shrink-0">
+              <%= if @current_user do %>
+                <form id="annotation-form" class="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    id="annotation-body"
+                    name="body"
+                    placeholder="Add comment..."
+                    class="rounded-lg bg-white/[0.05] border border-white/[0.1] text-slate-50 placeholder-slate-400 px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+                  />
+                  <input type="hidden" id="annotation-at" name="at" value="0" />
+                  <button
+                    type="submit"
+                    class="px-3 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-colors font-medium text-sm"
+                  >
+                    Post
+                  </button>
+                </form>
+              <% else %>
+                <p class="text-slate-400 text-sm">
+                  <.link
+                    navigate={~p"/sessions/new"}
+                    class="text-indigo-400 hover:text-indigo-300"
+                  >
+                    Log in
+                  </.link>
+                  to add comments.
+                </p>
+              <% end %>
+            </div>
+
+            <div
+              id="annotations"
+              phx-hook=".RoomAnnotations"
+              class="mt-4 flex-1 overflow-y-auto space-y-2 pr-2 min-h-0"
+            >
+              <%= for annotation <- @annotations do %>
+                <div
+                  class="annotation p-3 bg-white/[0.03] border border-white/[0.1] backdrop-blur-md rounded-lg text-sm"
+                  data-id={annotation.id}
+                  data-at={annotation.at}
+                >
+                  <div class="flex items-start justify-between gap-1">
+                    <div class="flex items-start gap-2 flex-1">
+                      <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded flex-shrink-0">
+                        <%= format_time(annotation.at) %>
+                      </span>
+                    </div>
+                    <%= if @current_user && @current_user.id == annotation.user_id do %>
+                      <button
+                        class="delete-annotation text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
+                        data-id={annotation.id}
+                        title="Delete comment"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3 w-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    <% end %>
+                  </div>
+                  <p class="font-semibold text-slate-50 text-xs mt-1">
+                    {annotation.user.username}
+                  </p>
+                  <p class="mt-1 text-slate-300 text-xs leading-relaxed">{annotation.body}</p>
+                </div>
+              <% end %>
+
+              <%= if Enum.empty?(@annotations) do %>
+                <p id="no-annotations" class="text-center text-slate-400 text-xs py-4">
+                  No comments yet
+                </p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script :type={Phoenix.LiveView.ColocatedHook} name=".RoomAnnotations">
+    export default {
+      mounted() {
+        const form = document.getElementById("annotation-form");
+        if (!form) return;
+
+        this.handleEvent("clear-annotation-form", () => {
+          document.getElementById("annotation-body").value = "";
+        });
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const body = document.getElementById("annotation-body").value;
+
+          if (body.trim()) {
+            this.pushEvent("submit-annotation-form", { body }, (reply) => {
+              console.log("Annotation submitted", reply);
+            });
+          }
+        });
+
+        // Handle delete buttons
+        const annotationsContainer = document.getElementById("annotations");
+        annotationsContainer.addEventListener("click", (e) => {
+          const btn = e.target.closest(".delete-annotation");
+          if (!btn) return;
+          const id = parseInt(btn.dataset.id);
+          this.pushEvent("delete-annotation", { id }, (reply) => {
+            console.log("Deleted annotation", id);
+          });
+        });
+      }
+    };
+  </script>
+</div>

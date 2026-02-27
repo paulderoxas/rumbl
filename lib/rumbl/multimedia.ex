@@ -163,4 +163,44 @@ defmodule Rumbl.Multimedia do
   def delete_annotation(%Annotation{} = annotation) do
     Repo.delete(annotation)
   end
+
+  # ============================================================================
+  # Rooms
+  # ============================================================================
+
+  alias Rumbl.Multimedia.Room
+
+  def create_room(%User{id: host_id}, %Video{id: video_id}) do
+    code = generate_room_code()
+
+    %Room{}
+    |> Room.changeset(%{code: code, video_id: video_id, host_id: host_id})
+    |> Repo.insert()
+  end
+
+  def get_room_by_code(code) do
+    Room
+    |> where([r], r.code == ^code and r.is_active == true)
+    |> preload([:video, :host])
+    |> Repo.one()
+  end
+
+  def get_active_room_for_host_and_video(host_id, video_id) do
+    Room
+    |> where([r], r.host_id == ^host_id and r.video_id == ^video_id and r.is_active == true)
+    |> preload([:host])
+    |> Repo.one()
+  end
+
+  def close_room(%Room{} = room) do
+    room
+    |> Room.changeset(%{is_active: false})
+    |> Repo.update()
+  end
+
+  defp generate_room_code do
+    :crypto.strong_rand_bytes(4)
+    |> Base.encode16()
+    |> String.upcase()
+  end
 end

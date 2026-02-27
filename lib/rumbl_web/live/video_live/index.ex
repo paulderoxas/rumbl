@@ -33,6 +33,16 @@ defmodule RumblWeb.VideoLive.Index do
      |> assign(videos: videos)}
   end
 
+  def handle_event("join_room", %{"code" => code}, socket) do
+    case Multimedia.get_room_by_code(code) do
+      nil ->
+        {:noreply, put_flash(socket, :error, "Room not found or has been closed.")}
+
+      room ->
+        {:noreply, push_navigate(socket, to: ~p"/rooms/#{room.code}")}
+    end
+  end
+
   # Reads user_id from the Plug session (written by Auth plug / SessionController)
   # and loads the User from the database
   defp get_user_from_session(session) do
