@@ -30,13 +30,13 @@ defmodule RumblWeb.Router do
     live("/users/new", UserLive.New)
     live("/users/:id", UserLive.Show)
 
-    # Videos (all protected by auth check inside each LiveView's mount)
+    # Videos
     live("/videos", VideoLive.Index)
     live("/videos/new", VideoLive.New)
-    live("/videos/:id", VideoLive.Show)
     live("/videos/:id/edit", VideoLive.Edit)
+    live("/videos/:id", VideoLive.Show)
 
-    # Watch (public — auth check is optional inside mount)
+    # Watch
     live("/watch/:id", VideoLive.Watch)
 
     # Keep the logout as a controller since it needs to drop the session
